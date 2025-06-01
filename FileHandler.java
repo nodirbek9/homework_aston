@@ -25,5 +25,4 @@ public class FileHandler {
         }
         return result.toString();
     }
-
-    }
+}
