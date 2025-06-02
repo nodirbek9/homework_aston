@@ -1,5 +1,4 @@
 package ru.aston.homework.Exception;
-
 public class Main {
     public static void main(String[] args) {
 
