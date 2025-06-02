@@ -1,10 +1,9 @@
 package ru.aston.homework.Exception;
-
 public class Main {
     public static void main(String[] args) {
 
         FileHandler handler = new FileHandler();
-        String path = "c:/Users/ayitb/Downloads/Programs/reader.txt";
+        String path = "reader.txt";
 
         try {
             handler.writeToFile(path, "Hello world!");
