@@ -2,42 +2,48 @@ package ru.aston.homework.MultiThread;
 
 public class MyLiveLock {
 
-    private static final Object lock1 = new Object();
-    private static final Object lock2 = new Object();
+    private static final Object LOCK1 = new Object();
+    private static final Object LOCK2 = new Object();
+    private static final int SLEEP_DURATION = 100;
 
     public static void main(String[] args) {
-        Thread thread1 = new Thread(() -> {
-            while (true) {
-                synchronized (lock1) {
-                    System.out.println("Поток 1 удерживает lock1, пытается получить lock2");
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    synchronized (lock2) {
-                        System.out.println("Поток 1 удерживает lock1 и lock2");
-                    }
-                }
-            }
-        });
-        Thread thread2 = new Thread(() -> {
-            while (true) {
-                synchronized (lock2) {
-                    System.out.println("Поток 2 удерживает lock2, пытается получить lock1");
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    synchronized (lock1) {
-                        System.out.println("Поток 2 удерживает lock1 и lock2");
-                    }
-                }
-            }
-        });
+        Thread thread1 = createThread("Поток 1", LOCK1, LOCK2);
+        Thread thread2 = createThread("Поток 2", LOCK2, LOCK1);
 
         thread1.start();
         thread2.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
+    }
+
+    private static Thread createThread(String name, Object firstLock, Object secondLock) {
+        return new Thread(() -> {
+            while (true) {
+                synchronized (firstLock) {
+                    System.out.println(name + " удерживает " + getLockName(firstLock) + ", пытается получить " + getLockName(secondLock));
+                    try {
+                        Thread.sleep(SLEEP_DURATION);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        e.printStackTrace();
+                    }
+                    synchronized (secondLock) {
+                        System.out.println(name + " удерживает оба: " + getLockName(firstLock) + " и " + getLockName(secondLock));
+                    }
+                }
+            }
+        });
+    }
+
+    private static String getLockName(Object lock) {
+        if (lock == LOCK1) return "LOCK1";
+        if (lock == LOCK2) return "LOCK2";
+        return "неизвестный LOCK2";
     }
 }
